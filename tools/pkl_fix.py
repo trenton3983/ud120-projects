@@ -10,7 +10,10 @@ You may use this code to change "word_data.pkl" to "word_data_unix.pkl" and then
 the new .pkl file on the script "nb_author_id.py":
 
 https://github.com/udacity/ud120-projects/issues/46
+https://stackoverflow.com/questions/45368255/error-in-loading-pickle
+https://stackoverflow.com/questions/2613800/how-to-convert-dos-windows-newline-crlf-to-unix-newline-lf-in-a-bash-script/19702943#19702943
 """
+
 original = "word_data.pkl"
 destination = "word_data_unix.pkl"
 
