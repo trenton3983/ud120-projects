@@ -16,7 +16,20 @@
 """
 
 import pickle
+from pathlib import Path
+from pprint import pprint as pp
 
-enron_data = pickle.load(open("../final_project/final_project_dataset.pkl", "r"))
+
+location_dir = Path(__file__).parents[1].joinpath('final_project')
+
+file_name = 'final_project_dataset_unix.pkl'
+
+file_name = location_dir.joinpath(file_name)
+print(file_name)
+
+enron_data = pickle.load(open(file_name, "rb"))
 
 
+if __name__ == '__main__':
+
+    pp(enron_data)
