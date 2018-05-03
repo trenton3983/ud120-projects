@@ -13,9 +13,14 @@ https://github.com/udacity/ud120-projects/issues/46
 https://stackoverflow.com/questions/45368255/error-in-loading-pickle
 https://stackoverflow.com/questions/2613800/how-to-convert-dos-windows-newline-crlf-to-unix-newline-lf-in-a-bash-script/19702943#19702943
 """
+from pathlib import Path
 
-original = "word_data.pkl"
-destination = "word_data_unix.pkl"
+location_dir = Path(__file__).parents[1].joinpath('final_project')
+
+file_name = 'final_project_dataset.pkl'
+
+original = location_dir.joinpath(file_name)
+destination = location_dir.joinpath(f"{file_name.split('.')[0]}_unix.pkl")
 
 content = ''
 outsize = 0
