@@ -66,9 +66,9 @@ if __name__ == '__main__':
     # Missing POIs
 
     no_total_payments = len([key for key, val in enron_data.items() if val['total_payments'] == 'NaN'])
-    print(f'Percent of people where total_payments = NaN: {no_total_payments}\n')
+    print(f'Percent of people where total_payments = NaN: {round(100 * no_total_payments/ds_features, 3)}%\n')
 
     poi_no_total_payments = len([key for key, val in enron_data.items() if
                                  (val['poi'] is True and val['total_payments'] == 'NaN')])
-    print(f'Percent of POI where total_payments = NaN: {poi_no_total_payments}\n')
+    print(f'Percent of POI where total_payments = NaN: {round(100 * poi_no_total_payments/ds_features, 3)}%\n')
 
