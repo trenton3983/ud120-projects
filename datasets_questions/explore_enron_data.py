@@ -39,7 +39,8 @@ if __name__ == '__main__':
     pp(names)
     print('\n')
 
-    print(f'Number of dataset features: {len(enron_data)}')
+    ds_features = len(enron_data)
+    print(f'Number of dataset features: {ds_features}')
 
     features_in_name = set([len(val) for key, val in enron_data.items()])
     print(f'Features for each name: {features_in_name} \n')
@@ -61,3 +62,13 @@ if __name__ == '__main__':
     print(f'Number of people in dataset with a salary: {has_salary}\n')
     has_email = len([key for key, val in enron_data.items() if val['email_address'] != 'NaN'])
     print(f'Number of people in dataset with a email address: {has_email}\n')
+
+    # Missing POIs
+
+    no_total_payments = len([key for key, val in enron_data.items() if val['total_payments'] == 'NaN'])
+    print(f'Percent of people where total_payments = NaN: {no_total_payments}\n')
+
+    poi_no_total_payments = len([key for key, val in enron_data.items() if
+                                 (val['poi'] is True and val['total_payments'] == 'NaN')])
+    print(f'Percent of POI where total_payments = NaN: {poi_no_total_payments}\n')
+
