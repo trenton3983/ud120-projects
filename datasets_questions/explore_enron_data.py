@@ -56,3 +56,8 @@ if __name__ == '__main__':
         print(f"{name} - total stock value: ${enron_data[name]['total_stock_value']}")
         pp(enron_data[name])
         print('\n')
+
+    has_salary = len([key for key, val in enron_data.items() if val['salary'] != 'NaN'])
+    print(f'Number of people in dataset with a salary: {has_salary}\n')
+    has_email = len([key for key, val in enron_data.items() if val['email_address'] != 'NaN'])
+    print(f'Number of people in dataset with a email address: {has_email}\n')
