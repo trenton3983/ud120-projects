@@ -33,3 +33,26 @@ enron_data = pickle.load(open(file_name, "rb"))
 if __name__ == '__main__':
 
     pp(enron_data)
+    print('\n')
+
+    names = [key for key, val in enron_data.items()]
+    pp(names)
+    print('\n')
+
+    print(f'Number of dataset features: {len(enron_data)}')
+
+    features_in_name = set([len(val) for key, val in enron_data.items()])
+    print(f'Features for each name: {features_in_name} \n')
+
+    poi_names = [key for key, val in enron_data.items() if val['poi'] is True]
+    print('People who are a POI:')
+    pp(poi_names)
+    print('\n')
+    print(f'There are {len(poi_names)} people in the dataset who are a POI.\n')
+
+    name_snip = 'pren'.lower()
+    find_name = [key for key, val in enron_data.items() if name_snip in key.lower()]
+    for name in find_name:
+        print(f"{name} - total stock value: ${enron_data[name]['total_stock_value']}")
+        pp(enron_data[name])
+        print('\n')
