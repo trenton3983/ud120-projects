@@ -32,10 +32,11 @@
 
 
 import numpy as np
+import pathlib
 
 
 def featureFormat(dictionary, features, remove_NaN=True, remove_all_zeroes=True,
-                  remove_any_zeroes=False, sort_keys=False):
+                  remove_any_zeroes=False, sort_keys=False, _print=False):
     """ convert dictionary to numpy array of features
         remove_NaN = True will convert "NaN" string to 0.0
         remove_all_zeroes = True will omit any data points for which
@@ -50,18 +51,20 @@ def featureFormat(dictionary, features, remove_NaN=True, remove_all_zeroes=True,
             removal for zero or missing values.
     """
 
-
     return_list = []
 
     # Key order - first branch is for Python 3 compatibility on mini-projects,
     # second branch is for compatibility on final project.
-    if isinstance(sort_keys, str):
+    if isinstance(sort_keys, pathlib.WindowsPath):
         import pickle
         keys = pickle.load(open(sort_keys, "rb"))
     elif sort_keys:
         keys = sorted(dictionary.keys())
     else:
         keys = list(dictionary.keys())
+
+    if _print is True:
+        print(f'Keys:\n{keys}')
 
     for key in keys:
         tmp_list = []
@@ -101,7 +104,10 @@ def featureFormat(dictionary, features, remove_NaN=True, remove_all_zeroes=True,
         if append:
             return_list.append(np.array(tmp_list))
 
-    return np.array(return_list)
+    return_list = np.array(return_list)
+    if _print is True:
+        print(return_list)
+    return return_list
 
 
 def targetFeatureSplit(data):
