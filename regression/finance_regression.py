@@ -65,8 +65,8 @@ plt.scatter(feature_test[0], target_test[0], color=test_color, label="test")
 plt.scatter(feature_test[0], target_test[0], color=train_color, label="train")
 
 
-print(f'Slope: {reg.coef_}')
-print(f'Intercept: {reg.intercept_}')
+print(f'Slope Train: {reg.coef_}')
+print(f'Intercept Train: {reg.intercept_}')
 
 print('\n########## Stats on Test Dataset ##########')
 print(f'r-squared score: {reg.score(feature_test, target_test)}')
@@ -75,9 +75,15 @@ print(f'r-squared score: {reg.score(feature_train, target_train)}\n')
 
 # draw the regression line, once it's coded
 try:
-    plt.plot(feature_test, reg.predict(feature_test))
+    plt.plot(feature_test, reg.predict(feature_test), color='r')
 except NameError:
     pass
+
+reg.fit(feature_test, target_test)
+print(f'Slope Test: {reg.coef_}')
+print(f'Intercept Test: {reg.intercept_}')
+plt.plot(feature_train, reg.predict(feature_train), color='b')
+
 plt.xlabel(features_list[1])
 plt.ylabel(features_list[0])
 plt.legend()
