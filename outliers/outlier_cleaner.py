@@ -1,6 +1,3 @@
-#!/usr/bin/python
-
-
 def outlierCleaner(predictions, ages, net_worths):
     """
         Clean away the 10% of points that have the largest
@@ -11,10 +8,13 @@ def outlierCleaner(predictions, ages, net_worths):
         each tuple is of the form (age, net_worth, error).
     """
     
-    cleaned_data = []
+    error = (net_worths - predictions)**2
+    cleaned_data = zip(ages, net_worths, error)
+    cleaned_data = sorted(cleaned_data, key=lambda tup: tup[2])
 
-    ### your code goes here
+    index = int(len(cleaned_data)*0.9)  # takes the best 90% leaving the worst/top 10%
 
-    
+    cleaned_data = cleaned_data[:index]
+
     return cleaned_data
 
