@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from feature_format import featureFormat, targetFeatureSplit
 from sklearn.cluster import KMeans
+from sklearn.preprocessing import MinMaxScaler
+import numpy as np
 
 
 def Draw(pred, features, poi, mark_poi=False, name="image.png", f1_name="feature 1", f2_name="feature 2"):
@@ -89,7 +91,7 @@ pred = KMeans(n_clusters=num_clusters).fit_predict(finance_features)
 # rename the "name" parameter when you change the number of features
 # so that the figure gets saved to a different file
 try:
-    Draw(pred, finance_features, poi, mark_poi=True,
+    Draw(pred, finance_features, poi, mark_poi=False,
          name=f"{str(num_clusters)}_clusters_{str(feature_count)}_features.png", f1_name=feature_1, f2_name=feature_2)
 except NameError:
     print("no predictions object named pred found, no clusters to plot")
@@ -119,3 +121,45 @@ print('\nWith a Pandas DataFrame:')
 data_dict_df = pd.DataFrame(data_dict)
 print(data_dict_df)
 print('\nMin exercised_stock_options: ', min([v for v in data_dict_df.loc['exercised_stock_options'] if v != 'NaN']))
+
+
+# Feature Scaling Mini-Project: Computing Rescaled Features
+scaler = MinMaxScaler()
+
+exercised_stock_options_weights = np.array([[float(min(exercised_stock_options_list))], [1000000.0], [float(max(exercised_stock_options_list))]])
+print('\nExercised Stock Options Weights:\n', exercised_stock_options_weights)
+exercised_stock_options_weights_rescaled = scaler.fit_transform(exercised_stock_options_weights)
+print('\nExercised Stock Options Rescaled:\n', exercised_stock_options_weights_rescaled)
+
+salary_weights = np.array([[float(min(salary_list))], [200000.0], [float(max(salary_list))]])
+print('\nSalary Weights:\n', salary_weights)
+salary_weights_rescaled = scaler.fit_transform(salary_weights)
+print('\nSalary Rescaled:\n', salary_weights_rescaled)
+
+
+# Plot rescaled data:
+if feature_count == 2:
+    plt.clf()
+    finance_features_rescaled = scaler.fit_transform(finance_features)
+    for f1, f2 in finance_features_rescaled:
+        plt.scatter(f1, f2)
+
+    plt.title(f'{num_clusters} clusters & {feature_count} features rescaled')
+    plt.xlabel(feature_1)
+    plt.ylabel(feature_2)
+    plt.savefig('features_scatter_rescaled.png')
+    plt.show()
+
+    # cluster here; create predictions of the cluster labels
+    # for the data and store them to a list called pred
+
+    pred = KMeans(n_clusters=num_clusters).fit_predict(finance_features_rescaled)
+
+    # rename the "name" parameter when you change the number of features
+    # so that the figure gets saved to a different file
+    try:
+        Draw(pred, finance_features_rescaled, poi, mark_poi=False,
+             name=f"{str(num_clusters)}_clusters_{str(feature_count)}_features_rescaled.png", f1_name=feature_1,
+             f2_name=feature_2)
+    except NameError:
+        print("no predictions object named pred found, no clusters to plot")
