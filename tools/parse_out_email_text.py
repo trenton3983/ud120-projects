@@ -42,7 +42,8 @@ def parseOutText(f):
         print(text_stem_list)
         # and append the stemmed word to words (make sure there's a single space between each stemmed word)
 
-        words = ' '.join(text_stem_list)
+        # words = ' '.join(text_stem_list)
+        words = text_stem_list
 
     return words
 
