@@ -2,9 +2,7 @@
 
 import os
 import pickle
-import re
-
-
+from sklearn.feature_extraction.text import TfidfVectorizer, TfidfTransformer
 from parse_out_email_text import parseOutText
 
 """
@@ -38,13 +36,16 @@ temp_counter = 0
 
 for name, from_person in [("sara", from_sara), ("chris", from_chris)]:
     for path in from_person:
-        path = path[:-2] + '_'
+        path = path.strip()
+        path = path[:-1] + '_'
         print(path)
         # only look at first 200 emails when developing
         # once everything is working, remove this line to run over full dataset
-        temp_counter += 1
+        # temp_counter += 1
         if temp_counter < 200:
-            path = os.path.join('C:/Data/', path)
+            local_dir = r'E:\PythonProjects\UDACITY_DATA\07_Machine_Learning'
+            # local_dir = 'C:/Data/'
+            path = os.path.join(local_dir, path)
             print(path)
             email = open(path, "r")
 
@@ -61,11 +62,7 @@ for name, from_person in [("sara", from_sara), ("chris", from_chris)]:
             word_data.append(text_cleaned)
 
             # append a 0 to from_data if email is from Sara, and 1 if email is from Chris
-            if name == 'sara':
-                from_data.append(0)
-            elif name == 'chris':
-                from_data.append(1)
-
+            from_data.append(0 if name == 'sara' else 1)
 
             email.close()
 
@@ -82,7 +79,20 @@ print(from_data)
 print(word_data[152])
 
 
+# in Part 4, do TfIdf vectorization here
+vectorizer = TfidfVectorizer(stop_words='english')
+X = vectorizer.fit_transform(word_data)
 
-### in Part 4, do TfIdf vectorization here
+transformer = TfidfTransformer()
+tfidf = transformer.fit_transform(X)
 
+stop_words = vectorizer.get_stop_words()
+print(tfidf)
+
+feature_names = vectorizer.get_feature_names()
+print(feature_names)
+print(len(feature_names))
+print(feature_names[34597])
+
+print('\nStop Words:\n', stop_words)
 
