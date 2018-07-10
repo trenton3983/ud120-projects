@@ -53,7 +53,9 @@ for name, from_person in [("sara", from_sara), ("chris", from_chris)]:
             text = parseOutText(email)
 
             # use str.replace() to remove any instances of the words
-            remove = ["sara", "shackleton", "chris", "germani"]
+            remove = ["sara", "shackleton", "chris", "germani",
+                      "sshacklensf", "cgermannsf", "cgerman",
+                      "shackletonhouectect", "shackletonhouect"]
 
             text_cleaned = [item for item in text if item not in remove]
             text_cleaned = ' '.join(text_cleaned)
@@ -95,4 +97,5 @@ print(len(feature_names))
 print(feature_names[34597])
 
 print('\nStop Words:\n', stop_words)
+print('Number of Stop Words:\n', len(stop_words))
 
