@@ -10,26 +10,22 @@ The dataset used in this example is a preprocessed excerpt of the
 
   .. _LFW: http://vis-www.cs.umass.edu/lfw/
 
-  original source: http://scikit-learn.org/stable/auto_examples/applications/face_recognition.html
+  original source: http://scikit-learn.org/stable/auto_examples/applications/plot_face_recognition.html
 
 """
 
-
-
-print __doc__
-
 from time import time
 import logging
-import pylab as pl
-import numpy as np
-
-from sklearn.cross_validation import train_test_split
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
 from sklearn.datasets import fetch_lfw_people
-from sklearn.grid_search import GridSearchCV
+from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
-from sklearn.decomposition import RandomizedPCA
+from sklearn.decomposition import PCA
 from sklearn.svm import SVC
+
+print(__doc__)
 
 # Display progress logs on stdout
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
@@ -41,7 +37,6 @@ lfw_people = fetch_lfw_people(min_faces_per_person=70, resize=0.4)
 
 # introspect the images arrays to find the shapes (for plotting)
 n_samples, h, w = lfw_people.images.shape
-np.random.seed(42)
 
 # for machine learning we use the data directly (as relative pixel
 # position info is ignored by this model)
@@ -53,10 +48,10 @@ y = lfw_people.target
 target_names = lfw_people.target_names
 n_classes = target_names.shape[0]
 
-print "Total dataset size:"
-print "n_samples: %d" % n_samples
-print "n_features: %d" % n_features
-print "n_classes: %d" % n_classes
+print("Total dataset size:")
+print(f"n_samples: {n_samples}")
+print(f"n_features: {n_features}")
+print(f"n_classes: {n_classes}")
 
 
 ###############################################################################
@@ -68,47 +63,46 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random
 # dataset): unsupervised feature extraction / dimensionality reduction
 n_components = 150
 
-print "Extracting the top %d eigenfaces from %d faces" % (n_components, X_train.shape[0])
+print(f"Extracting the top {n_components} eigenfaces from {X_train.shape[0]} faces")
 t0 = time()
-pca = RandomizedPCA(n_components=n_components, whiten=True).fit(X_train)
-print "done in %0.3fs" % (time() - t0)
+pca = PCA(svd_solver='randomized', n_components=n_components, whiten=True).fit(X_train)
+print("done in %0.3fs" % (time() - t0))
 
 eigenfaces = pca.components_.reshape((n_components, h, w))
 
-print "Projecting the input data on the eigenfaces orthonormal basis"
+print("Projecting the input data on the eigenfaces orthonormal basis")
 t0 = time()
 X_train_pca = pca.transform(X_train)
 X_test_pca = pca.transform(X_test)
-print "done in %0.3fs" % (time() - t0)
+print("done in %0.3fs" % (time() - t0))
 
 
 ###############################################################################
 # Train a SVM classification model
 
-print "Fitting the classifier to the training set"
+print("Fitting the classifier to the training set")
 t0 = time()
-param_grid = {
-         'C': [1e3, 5e3, 1e4, 5e4, 1e5],
-          'gamma': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1],
-          }
+param_grid = {'C': [1e3, 5e3, 1e4, 5e4, 1e5],
+              'gamma': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1],
+              }
 # for sklearn version 0.16 or prior, the class_weight parameter value is 'auto'
 clf = GridSearchCV(SVC(kernel='rbf', class_weight='balanced'), param_grid)
 clf = clf.fit(X_train_pca, y_train)
-print "done in %0.3fs" % (time() - t0)
-print "Best estimator found by grid search:"
-print clf.best_estimator_
+print("done in %0.3fs" % (time() - t0))
+print("Best estimator found by grid search:")
+print(clf.best_estimator_)
 
 
 ###############################################################################
 # Quantitative evaluation of the model quality on the test set
 
-print "Predicting the people names on the testing set"
+print("Predicting the people names on the testing set")
 t0 = time()
 y_pred = clf.predict(X_test_pca)
-print "done in %0.3fs" % (time() - t0)
+print("done in %0.3fs" % (time() - t0))
 
-print classification_report(y_test, y_pred, target_names=target_names)
-print confusion_matrix(y_test, y_pred, labels=range(n_classes))
+print(classification_report(y_test, y_pred, target_names=target_names))
+print(confusion_matrix(y_test, y_pred, labels=range(n_classes)))
 
 
 ###############################################################################
@@ -116,14 +110,14 @@ print confusion_matrix(y_test, y_pred, labels=range(n_classes))
 
 def plot_gallery(images, titles, h, w, n_row=3, n_col=4):
     """Helper function to plot a gallery of portraits"""
-    pl.figure(figsize=(1.8 * n_col, 2.4 * n_row))
-    pl.subplots_adjust(bottom=0, left=.01, right=.99, top=.90, hspace=.35)
+    plt.figure(figsize=(1.8 * n_col, 2.4 * n_row))
+    plt.subplots_adjust(bottom=0, left=.01, right=.99, top=.90, hspace=.35)
     for i in range(n_row * n_col):
-        pl.subplot(n_row, n_col, i + 1)
-        pl.imshow(images[i].reshape((h, w)), cmap=pl.cm.gray)
-        pl.title(titles[i], size=12)
-        pl.xticks(())
-        pl.yticks(())
+        plt.subplot(n_row, n_col, i + 1)
+        plt.imshow(images[i].reshape((h, w)), cmap=plt.cm.gray)
+        plt.title(titles[i], size=12)
+        plt.xticks(())
+        plt.yticks(())
 
 
 # plot the result of the prediction on a portion of the test set
@@ -133,8 +127,8 @@ def title(y_pred, y_test, target_names, i):
     true_name = target_names[y_test[i]].rsplit(' ', 1)[-1]
     return 'predicted: %s\ntrue:      %s' % (pred_name, true_name)
 
-prediction_titles = [title(y_pred, y_test, target_names, i)
-                         for i in range(y_pred.shape[0])]
+
+prediction_titles = [title(y_pred, y_test, target_names, i) for i in range(y_pred.shape[0])]
 
 plot_gallery(X_test, prediction_titles, h, w)
 
@@ -143,4 +137,4 @@ plot_gallery(X_test, prediction_titles, h, w)
 eigenface_titles = ["eigenface %d" % i for i in range(eigenfaces.shape[0])]
 plot_gallery(eigenfaces, eigenface_titles, h, w)
 
-pl.show()
+plt.show()
