@@ -52,6 +52,7 @@ print("Total dataset size:")
 print(f"n_samples: {n_samples}")
 print(f"n_features: {n_features}")
 print(f"n_classes: {n_classes}")
+print('\n')
 
 
 ###############################################################################
@@ -61,80 +62,88 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random
 ###############################################################################
 # Compute a PCA (eigenfaces) on the face dataset (treated as unlabeled
 # dataset): unsupervised feature extraction / dimensionality reduction
-n_components = 150
+n_components_list = [10, 15, 25, 50, 100, 150, 250]
 
-print(f"Extracting the top {n_components} eigenfaces from {X_train.shape[0]} faces")
-t0 = time()
-pca = PCA(svd_solver='randomized', n_components=n_components, whiten=True).fit(X_train)
-print("done in %0.3fs" % (time() - t0))
+for n_components in n_components_list:
 
-eigenfaces = pca.components_.reshape((n_components, h, w))
+    print(f"Extracting the top {n_components} eigenfaces from {X_train.shape[0]} faces")
+    t0 = time()
+    pca = PCA(svd_solver='randomized', n_components=n_components, whiten=True).fit(X_train)
+    print("done in %0.3fs" % (time() - t0))
 
-print("Projecting the input data on the eigenfaces orthonormal basis")
-t0 = time()
-X_train_pca = pca.transform(X_train)
-X_test_pca = pca.transform(X_test)
-print("done in %0.3fs" % (time() - t0))
+    eigenfaces = pca.components_.reshape((n_components, h, w))
 
-
-###############################################################################
-# Train a SVM classification model
-
-print("Fitting the classifier to the training set")
-t0 = time()
-param_grid = {'C': [1e3, 5e3, 1e4, 5e4, 1e5],
-              'gamma': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1],
-              }
-# for sklearn version 0.16 or prior, the class_weight parameter value is 'auto'
-clf = GridSearchCV(SVC(kernel='rbf', class_weight='balanced'), param_grid)
-clf = clf.fit(X_train_pca, y_train)
-print("done in %0.3fs" % (time() - t0))
-print("Best estimator found by grid search:")
-print(clf.best_estimator_)
+    print("Projecting the input data on the eigenfaces orthonormal basis")
+    t0 = time()
+    X_train_pca = pca.transform(X_train)
+    X_test_pca = pca.transform(X_test)
+    print("done in %0.3fs" % (time() - t0))
 
 
-###############################################################################
-# Quantitative evaluation of the model quality on the test set
+    ###############################################################################
+    # Train a SVM classification model
 
-print("Predicting the people names on the testing set")
-t0 = time()
-y_pred = clf.predict(X_test_pca)
-print("done in %0.3fs" % (time() - t0))
-
-print(classification_report(y_test, y_pred, target_names=target_names))
-print(confusion_matrix(y_test, y_pred, labels=range(n_classes)))
-
-
-###############################################################################
-# Qualitative evaluation of the predictions using matplotlib
-
-def plot_gallery(images, titles, h, w, n_row=3, n_col=4):
-    """Helper function to plot a gallery of portraits"""
-    plt.figure(figsize=(1.8 * n_col, 2.4 * n_row))
-    plt.subplots_adjust(bottom=0, left=.01, right=.99, top=.90, hspace=.35)
-    for i in range(n_row * n_col):
-        plt.subplot(n_row, n_col, i + 1)
-        plt.imshow(images[i].reshape((h, w)), cmap=plt.cm.gray)
-        plt.title(titles[i], size=12)
-        plt.xticks(())
-        plt.yticks(())
+    print("Fitting the classifier to the training set")
+    t0 = time()
+    param_grid = {'C': [1e3, 5e3, 1e4, 5e4, 1e5],
+                  'gamma': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1],
+                  }
+    # for sklearn version 0.16 or prior, the class_weight parameter value is 'auto'
+    clf = GridSearchCV(SVC(kernel='rbf', class_weight='balanced'), param_grid)
+    clf = clf.fit(X_train_pca, y_train)
+    print("done in %0.3fs" % (time() - t0))
+    print("Best estimator found by grid search:")
+    print(clf.best_estimator_)
 
 
-# plot the result of the prediction on a portion of the test set
+    ###############################################################################
+    # Quantitative evaluation of the model quality on the test set
 
-def title(y_pred, y_test, target_names, i):
-    pred_name = target_names[y_pred[i]].rsplit(' ', 1)[-1]
-    true_name = target_names[y_test[i]].rsplit(' ', 1)[-1]
-    return 'predicted: %s\ntrue:      %s' % (pred_name, true_name)
+    print("Predicting the people names on the testing set")
+    t0 = time()
+    y_pred = clf.predict(X_test_pca)
+    print("done in %0.3fs" % (time() - t0))
+
+    print('\nClassification Report: \n', classification_report(y_test, y_pred, target_names=target_names))
+    print('\nConfusion Matrix: \n', confusion_matrix(y_test, y_pred, labels=range(n_classes)))
 
 
-prediction_titles = [title(y_pred, y_test, target_names, i) for i in range(y_pred.shape[0])]
+    ###############################################################################
+    # Qualitative evaluation of the predictions using matplotlib
 
-plot_gallery(X_test, prediction_titles, h, w)
+    def plot_gallery(images, titles, h, w, n_row=3, n_col=4):
+        """Helper function to plot a gallery of portraits"""
+        plt.figure(figsize=(1.8 * n_col, 2.4 * n_row))
+        plt.subplots_adjust(bottom=0, left=.01, right=.99, top=.90, hspace=.35)
+        for i in range(n_row * n_col):
+            plt.subplot(n_row, n_col, i + 1)
+            plt.imshow(images[i].reshape((h, w)), cmap=plt.cm.gray)
+            plt.title(titles[i], size=12)
+            plt.xticks(())
+            plt.yticks(())
 
-# plot the gallery of the most significative eigenfaces
 
-eigenface_titles = ["eigenface %d" % i for i in range(eigenfaces.shape[0])]
-plot_gallery(eigenfaces, eigenface_titles, h, w)
+    # plot the result of the prediction on a portion of the test set
 
-plt.show()
+    def title(y_pred, y_test, target_names, i):
+        pred_name = target_names[y_pred[i]].rsplit(' ', 1)[-1]
+        true_name = target_names[y_test[i]].rsplit(' ', 1)[-1]
+        return 'predicted: %s\ntrue:      %s' % (pred_name, true_name)
+
+
+    prediction_titles = [title(y_pred, y_test, target_names, i) for i in range(y_pred.shape[0])]
+
+    plot_gallery(X_test, prediction_titles, h, w)
+
+    # plot the gallery of the most significative eigenfaces
+
+    eigenface_titles = ["eigenface %d" % i for i in range(eigenfaces.shape[0])]
+    try:
+        plot_gallery(eigenfaces, eigenface_titles, h, w)
+        plt.show()
+    except IndexError:
+        print(f"\nCan't plot n_components = {n_components}")
+
+    print('\nVariance of First Component: ', pca.explained_variance_ratio_[0])
+    print('Variance of Second Component: ', pca.explained_variance_ratio_[1])
+    print('\n')
