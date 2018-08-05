@@ -56,7 +56,7 @@ print('Number of People in the Test Set: ', people_count_in_test_set)
 
 # Lesson 15.30: Accuracy of Biased Identifier
 print('\nLesson 15.30: Accuracy of Biased Identifier')
-accuracy_ = accuracy_score(labels_test, prediction_)
+accuracy_ = accuracy_score(labels_test, prediction_)  # same result as clf.score
 accuracy_if_0 = pois_in_test_set[0]/people_count_in_test_set  # 0.8620689655172413
 print('Accuracy: ', accuracy_)
 print('If the identifier predicted 0 for everyone in the test set, what would the accuracy be?: ', accuracy_if_0)
@@ -64,9 +64,6 @@ print('If the identifier predicted 0 for everyone in the test set, what would th
 # Lesson 15.31: Number of True Positives
 print('\nLesson 15.31: Number of True Positives')
 poi_confusion_matrix = confusion_matrix(labels_test, prediction_, labels=[0, 1])
-print('Confusion Matrix:')
-print(poi_confusion_matrix)
-print('Number of True Positives: ', poi_confusion_matrix[1][1])
 
 
 def plot_confusion_matrix(cm, classes,
@@ -120,6 +117,8 @@ plot_confusion_matrix(poi_confusion_matrix, classes=class_names, normalize=True,
                       title='Confusion matrix 15.31, normalized')
 
 plt.show()
+
+print('Number of True Positives: ', poi_confusion_matrix[1][1])
 
 # Lesson 15.32: Unpacking Into Precision and Recall
 print('\nLesson 15.32: Unpacking Into Precision and Recall')
